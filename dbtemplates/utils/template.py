@@ -1,5 +1,6 @@
+import os
 from django.template import (Template, TemplateDoesNotExist,
-                             TemplateSyntaxError)
+                             TemplateSyntaxError, utils)
 
 
 def get_loaders():
@@ -31,3 +32,19 @@ def check_template_syntax(template):
     except TemplateSyntaxError as e:
         return (False, e)
     return (True, None)
+
+
+def update_database_template_content(instance, **kwargs):
+    """
+    Update database content from its respective file template
+    """
+    app_template_dirs = utils.get_app_template_dirs('templates')
+    templatedirs = [d for d in app_template_dirs if os.path.isdir(d)]
+    path = str(templatedirs[0]) + '/' + instance.name
+
+    try:
+        with open(path, encoding='utf-8') as f:
+            instance.content = f.read()
+            instance.save()
+    except Exception:
+        pass

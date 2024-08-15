@@ -8,7 +8,7 @@ from django.utils.safestring import mark_safe
 from dbtemplates.conf import settings
 from dbtemplates.models import (Template, remove_cached_template,
                                 add_template_to_cache)
-from dbtemplates.utils.template import check_template_syntax
+from dbtemplates.utils.template import check_template_syntax, update_database_template_content
 
 # Check if either django-reversion-compare or django-reversion is installed and
 # use reversion_compare's CompareVersionAdmin or reversion's VersionAdmin as
@@ -113,8 +113,22 @@ class TemplateAdmin(TemplateModelAdmin):
     list_filter = ('sites',)
     save_as = True
     search_fields = ('name', 'content')
-    actions = ['invalidate_cache', 'repopulate_cache', 'check_syntax']
+    actions = ['sync_from_template_files', 'invalidate_cache', 'repopulate_cache', 'check_syntax']
 
+    def sync_from_template_files(self, request, queryset):
+        """
+            Sync content from the template file, to the database template object
+        """
+        for template in queryset:
+            update_database_template_content(template)
+        count = queryset.count()
+        message = ungettext(
+            "One Template has been successfully synced from its respective template file.",
+            " %(count)d Templates have been successfully synced from their respective template files.",
+            count)
+        self.message_user(request, message % {'count': count})
+    sync_from_template_files.short_description = _("Update database template content "
+                                           "from template files ")
     def invalidate_cache(self, request, queryset):
         for template in queryset:
             remove_cached_template(template)
