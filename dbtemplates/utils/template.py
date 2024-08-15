@@ -46,6 +46,5 @@ def update_database_template_content(instance, **kwargs):
         with open(path, encoding='utf-8') as f:
             instance.content = f.read()
             instance.save()
-        print(f'''Database Template: {instance.name} Content Updated Successfully''')
-    except Exception as e:
-        print(f'''An Error Occured- {e}''')
+    except Exception:
+        pass

@@ -116,6 +116,9 @@ class TemplateAdmin(TemplateModelAdmin):
     actions = ['sync_from_template_files', 'invalidate_cache', 'repopulate_cache', 'check_syntax']
 
     def sync_from_template_files(self, request, queryset):
+        """
+            Sync content from the template file, to the database template object
+        """
         for template in queryset:
             update_database_template_content(template)
         count = queryset.count()
