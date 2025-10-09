@@ -1,8 +1,8 @@
-from pkg_resources import get_distribution, DistributionNotFound
+import importlib.metadata
 
 try:
-    __version__ = get_distribution("django-dbtemplates").version
-except DistributionNotFound:
+    __version__ = importlib.metadata.version("django-dbtemplates")
+except importlib.metadata.PackageNotFoundError:
     # package is not installed
     __version__ = None
 
